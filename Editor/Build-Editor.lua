@@ -1,7 +1,8 @@
-project "App"
+project "Editor"
    kind "ConsoleApp"
    language "C++"
-   cppdialect "C++20"
+   cppdialect "C++latest"
+   location "Source"
    targetdir "Binaries/%{cfg.buildcfg}"
    staticruntime "off"
 
@@ -12,16 +13,19 @@ project "App"
       "Source",
 
 	  -- Include Core
-	  "../Core/Source"
+	  "../Engine/Source",
+      "../Vendor/Modules/glm"
    }
 
    links
    {
-      "Core"
+      "Engine"
    }
 
    targetdir ("../Binaries/" .. OutputDir .. "/%{prj.name}")
    objdir ("../Binaries/Intermediates/" .. OutputDir .. "/%{prj.name}")
+
+   defines { "ENGINE_ENTRY_POINT" }
 
    filter "system:windows"
        systemversion "latest"

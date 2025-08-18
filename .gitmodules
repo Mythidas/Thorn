@@ -1,0 +1,9 @@
+[submodule "Vendor/Modules/glfw"]
+	path = Vendor/Modules/glfw
+	url = git@github.com:Mythidas/glfw.git
+[submodule "Vendor/Modules/glm"]
+	path = Vendor/Modules/glm
+	url = https://github.com/g-truc/glm.git
+[submodule "Vendor/Modules/stb"]
+	path = Vendor/Modules/stb
+	url = https://github.com/nothings/stb.git

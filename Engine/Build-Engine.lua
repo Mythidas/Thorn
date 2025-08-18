@@ -1,19 +1,35 @@
-project "Core"
+project "Engine"
    kind "StaticLib"
    language "C++"
-   cppdialect "C++20"
+   cppdialect "C++latest"
+   location "Source/Thorn"
    targetdir "Binaries/%{cfg.buildcfg}"
    staticruntime "off"
 
-   files { "Source/**.h", "Source/**.cpp" }
+   files { "Source/Thorn/**.h", "Source/Thorn/**.cpp", "../Vendor/Modules/glad/src/glad.c" }
+
+   pchheader "Thorn/pch.h"
+   pchsource "Source/Thorn/pch.cpp"
 
    includedirs
    {
-      "Source"
+      "Source",
+      "../Vendor/Modules/glfw/include",
+      "../Vendor/Modules/glad/include",
+      "../Vendor/Modules/glm",
+      "../Vendor/Modules/stb"
+   }
+
+   links
+   {
+       "GLFW"
    }
 
    targetdir ("../Binaries/" .. OutputDir .. "/%{prj.name}")
    objdir ("../Binaries/Intermediates/" .. OutputDir .. "/%{prj.name}")
+
+   filter { "files:../Vendor/Modules/glad/src/glad.c" }
+       flags { "NoPCH" }
 
    filter "system:windows"
        systemversion "latest"
