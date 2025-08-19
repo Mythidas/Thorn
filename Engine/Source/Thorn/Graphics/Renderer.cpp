@@ -5,7 +5,7 @@
 
 #include "Renderer.h"
 #include "RenderBuffer.h"
-#include "GraphicsPipeline.h"
+#include "Shader.h"
 #include "RenderCommands.h"
 #include "Thorn/Core/Application.h"
 
@@ -28,7 +28,7 @@ namespace Thorn
 
 		struct Data
 		{
-			Ref<GraphicsPipeline> Pipeline;
+			Ref<Shader> Shader;
 			Ref<RenderBuffer> Buffer;
 			Vertex* StagingBuffer{ nullptr };
 			Vertex* StagingBufferPtr{ nullptr };
@@ -113,14 +113,14 @@ namespace Thorn
 		cameraSpecs.Usage = BufferUsage::Uniform;
 		s_QuadData.CameraUniform = RenderBuffer::Create(cameraSpecs);
 
-		GraphicsPipelineSpecs pipelineSpecs{};
+		ShaderSpecs pipelineSpecs{};
 		pipelineSpecs.VertPath = "../Assets/Shaders/QuadShader.vert";
 		pipelineSpecs.FragPath = "../Assets/Shaders/QuadShader.frag";
 		pipelineSpecs.pVertexBuffer = s_QuadData.Buffer;
 		pipelineSpecs.pIndexBuffer = indexBuffer;
 		pipelineSpecs.pRenderBuffers = { s_QuadData.CameraUniform };
 		pipelineSpecs.Attributes = { VertexAttribute::Float3, VertexAttribute::Float4, VertexAttribute::Float2, VertexAttribute::Float };
-		s_QuadData.Pipeline = GraphicsPipeline::Create(pipelineSpecs);
+		s_QuadData.Shader = Shader::Create(pipelineSpecs);
 
 		FramebufferSpecs sbSpecs{};
 		sbSpecs.Size = { Application::Get().GetWindow()->GetWidth(), Application::Get().GetWindow()->GetHeight() };
@@ -251,7 +251,7 @@ namespace Thorn
 		size_t size = (uint8_t*)s_QuadData.StagingBufferPtr - (uint8_t*)s_QuadData.StagingBuffer;
 		s_QuadData.Buffer->SetData(s_QuadData.StagingBuffer, size, 0);
 
-		s_QuadData.Pipeline->Draw(s_QuadData.IndexCount);
+		s_QuadData.Shader->Draw(s_QuadData.IndexCount);
 	}
 
 	float Renderer::_GetTextureIndex(Ref<Image> texture)

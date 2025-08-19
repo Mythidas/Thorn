@@ -7,27 +7,59 @@
 namespace Thorn
 {
 	template <typename... Args>
-	class Event
+	class EventListener
 	{
 	private:
 		using Func = std::function<bool(Args...)>;
 
 	public:
-		void operator()(Args... args)
+		EventListener() {}
+		EventListener(const Func& callback)
+			: Callback(callback)
 		{
-			for (auto& callback : m_Callbacks)
+		}
+
+		bool operator()(Args... args) const
+		{
+			if (Callback)
+				return Callback(args...);
+
+			return false;
+		}
+
+		uint32_t ID;
+		Func Callback;
+	};
+
+	template <typename... Args>
+	class Event
+	{
+	public:
+		void operator()(Args... args) const
+		{
+			for (const EventListener<Args...>& callback : m_Callbacks)
 			{
 				if (callback(args...))
 					break;
 			}
 		}
 
-		void operator +=(const Func& callback)
+		void operator +=(EventListener<Args...>& listener)
 		{
-			m_Callbacks.push_back(callback);
+			listener.ID = m_Counter++;
+			m_Callbacks.push_back(listener);
+		}
+
+		void operator-=(const EventListener<Args...>& listener)
+		{
+			auto it = std::find_if(m_Callbacks.begin(), m_Callbacks.end(),
+				[&](auto& l) { return l.ID == listener.ID; });
+			if (it != m_Callbacks.end())
+				m_Callbacks.erase(it);
 		}
 
 	private:
-		std::vector<Func> m_Callbacks;
+		std::vector<EventListener<Args...>> m_Callbacks;
+		uint32_t m_Counter = 0;
 	};
 }

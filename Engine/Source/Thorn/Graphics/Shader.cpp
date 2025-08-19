@@ -1,64 +1,167 @@
 #include "Thorn/pch.h"
 #include "Shader.h"
-
 #include "Thorn/Lib/File.h"
-#include "glad/glad.h"
+
+#include <glad/glad.h>
 
 namespace Thorn
 {
-	Shader::Shader(const ShaderSpecs& specs)
-		: m_Specs(specs), m_ProgramID(0)
+	namespace Utils
 	{
-		std::string vertSrc = File(specs.VertexPath).ReadString();
-		std::string fragSrc = File(specs.FragmentPath).ReadString();
+		static bool LogShaderError(uint32_t shader)
+		{
+			int success;
+			char infoLog[512];
 
-        const char* vertCode = vertSrc.c_str();
-        const char* fragCode = fragSrc.c_str();
+			glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+			if (!success)
+			{
+				glGetShaderInfoLog(shader, 512, nullptr, infoLog);
+				Log::Error("Shader Compile Error");
+				return false;
+			}
 
-        uint32_t vertexShader = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertexShader, 1, &vertCode, NULL);
-        glCompileShader(vertexShader);
+			return true;
+		}
 
-        // check for shader compile errors
-        int success;
-        char infoLog[512];
-        glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-        if (!success)
-        {
-            glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-            Log::Error("ERROR::SHADER::VERTEX::COMPILATION_FAILED");
-        }
+		static bool LogProgramError(uint32_t program)
+		{
+			int success;
+			char infoLog[512];
 
-        // fragment shader
-        uint32_t fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragmentShader, 1, &fragCode, NULL);
-        glCompileShader(fragmentShader);
-        // check for shader compile errors
-        glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-        if (!success)
-        {
-            glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-            Log::Error("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED");
-        }
+			glGetProgramiv(program, GL_LINK_STATUS, &success);
+			if (!success)
+			{
+				glGetShaderInfoLog(program, 512, nullptr, infoLog);
+				Log::Error("Program Link Error");
+				return false;
+			}
 
-        // link shaders
-        m_ProgramID = glCreateProgram();
-        glAttachShader(m_ProgramID, vertexShader);
-        glAttachShader(m_ProgramID, fragmentShader);
-        glLinkProgram(m_ProgramID);
-        // check for linking errors
-        glGetProgramiv(m_ProgramID, GL_LINK_STATUS, &success);
-        if (!success)
-        {
-            glGetProgramInfoLog(m_ProgramID, 512, NULL, infoLog);
-            Log::Error("ERROR::SHADER::PROGRAM::LINKING_FAILED");
-        }
-        glDeleteShader(vertexShader);
-        glDeleteShader(fragmentShader);
+			return true;
+		}
+
+		static int GetAttributeSize(VertexAttribute attrib)
+		{
+			switch (attrib)
+			{
+			case VertexAttribute::Float: return 4 * 1;
+			case VertexAttribute::Float2: return 4 * 2;
+			case VertexAttribute::Float3: return 4 * 3;
+			case VertexAttribute::Float4: return 4 * 4;
+			default: return 4;
+			}
+		}
+
+		static int GetAttributeCount(VertexAttribute attrib)
+		{
+			switch (attrib)
+			{
+			case VertexAttribute::Float: return 1;
+			case VertexAttribute::Float2: return 2;
+			case VertexAttribute::Float3: return 3;
+			case VertexAttribute::Float4: return 4;
+			default: return 1;
+			}
+		}
+
+		static GLenum GetAttributeType(VertexAttribute attrib)
+		{
+			switch (attrib)
+			{
+			case VertexAttribute::Float: return GL_FLOAT;
+			case VertexAttribute::Float2: return GL_FLOAT;
+			case VertexAttribute::Float3: return GL_FLOAT;
+			case VertexAttribute::Float4: return GL_FLOAT;
+			default: return GL_FLOAT;
+			}
+		}
 	}
 
-    void Shader::Use() const
-    {
-        glUseProgram(m_ProgramID);
-    }
+	Shader::Shader(const ShaderSpecs& specs)
+		: m_Specs(specs), m_RenderID(0), m_VertexID(0)
+	{
+		std::string vertSrc = File(specs.VertPath).ReadString();
+		std::string fragSrc = File(specs.FragPath).ReadString();
+
+		const char* vertCode = vertSrc.c_str();
+		const char* fragCode = fragSrc.c_str();
+
+		uint32_t vertShader = glCreateShader(GL_VERTEX_SHADER);
+		glShaderSource(vertShader, 1, &vertCode, nullptr);
+		glCompileShader(vertShader);
+
+		if (!Utils::LogShaderError(vertShader))
+		{
+			Log::Error("Failed to Create Shader");
+			return;
+		}
+
+		uint32_t fragShader = glCreateShader(GL_FRAGMENT_SHADER);
+		glShaderSource(fragShader, 1, &fragCode, nullptr);
+		glCompileShader(fragShader);
+
+		if (!Utils::LogShaderError(fragShader))
+		{
+			Log::Error("Failed to Create Shader");
+			return;
+		}
+
+		m_RenderID = glCreateProgram();
+		glAttachShader(m_RenderID, vertShader);
+		glAttachShader(m_RenderID, fragShader);
+		glLinkProgram(m_RenderID);
+
+		if (!Utils::LogProgramError(m_RenderID))
+		{
+			Log::Error("Failed to Create Program ID");
+			return;
+		}
+
+		glDeleteShader(vertShader);
+		glDeleteShader(fragShader);
+
+		glGenVertexArrays(1, &m_VertexID);
+		glBindVertexArray(m_VertexID);
+
+		m_Specs.pVertexBuffer->Bind();
+		m_Specs.pIndexBuffer->Bind();
+
+		GLsizei stride = 0;
+		for (auto& attrib : m_Specs.Attributes)
+		{
+			stride += Utils::GetAttributeSize(attrib);
+		}
+
+		size_t offset = 0;
+		for (GLuint i = 0; i < m_Specs.Attributes.size(); i++)
+		{
+			glEnableVertexArrayAttrib(m_VertexID, i);
+			glVertexAttribPointer(i, Utils::GetAttributeCount(m_Specs.Attributes[i]), Utils::GetAttributeType(m_Specs.Attributes[i]), GL_FALSE, stride, (void*)offset);
+			offset += Utils::GetAttributeSize(m_Specs.Attributes[i]);
+		}
+
+		uint32_t camera_index = glGetUniformBlockIndex(m_RenderID, "Camera");
+		glUniformBlockBinding(m_RenderID, camera_index, 0);
+	}
+
+	void Shader::Draw(uint32_t count) const
+	{
+		glUseProgram(m_RenderID);
+		glBindVertexArray(m_VertexID);
+
+		for (auto& buffer : m_Specs.pRenderBuffers)
+		{
+			buffer->Bind();
+		}
+
+		if (m_Specs.pIndexBuffer)
+		{
+			m_Specs.pIndexBuffer->Bind();
+			glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
+		}
+		else
+		{
+			glDrawArrays(GL_TRIANGLES, 0, count);
+		}
+	}
 }

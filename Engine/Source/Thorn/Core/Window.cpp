@@ -45,6 +45,8 @@ namespace Thorn
             return;
         }
 
+        glfwSetWindowUserPointer(m_Window, this);
+
         glfwSetErrorCallback([](int error, const char* desc)
         {
             Log::Error(desc);

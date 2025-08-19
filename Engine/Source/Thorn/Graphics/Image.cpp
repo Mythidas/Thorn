@@ -130,10 +130,10 @@ namespace Thorn
 
 	void Image::SetData(void* data, size_t size)
 	{
-		uint32_t imageSize = (m_Specs.Size.x * m_Specs.Size.y * m_Specs.Size.z) * Utils::FormatSize(m_Specs.Format);
-		if (size != static_cast<size_t>(imageSize))
+		size_t imageSize = static_cast<size_t>((m_Specs.Size.x * m_Specs.Size.y * m_Specs.Size.z) * Utils::FormatSize(m_Specs.Format));
+		if (size != imageSize)
 		{
-			Log::Error("Size does not match Image Size!");
+			Log::Error("Size does not match Image Size! Expected: {}", imageSize);
 			return;
 		}
 

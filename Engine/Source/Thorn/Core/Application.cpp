@@ -4,6 +4,7 @@
 #include "Thorn/Graphics/Camera.h"
 #include "Thorn/Graphics/Transform.h"
 #include "Thorn/Graphics/Renderer.h"
+#include "Time.h"
 
 namespace Thorn
 {
@@ -13,22 +14,48 @@ namespace Thorn
 		m_Window = Window::Create(windowSpecs);
 		
 		Renderer::_Init();
+
+		m_WindowCloseListener = EventListener<>(THORN_BIND_FNC(_OnWindowClose));
+		Window::OnWindowClose += m_WindowCloseListener;
+	}
+
+	Application::~Application()
+	{
+		m_LayerStack.Clear();
+		Renderer::_Destroy();
+
+		Log::Info("Application shutdown...");
 	}
 
 	void Application::Run()
 	{
-		Camera camera{};
-		Transform transform{};
+		m_Running = true;
 
-		camera.ClearColor = { 1.0f, 0.7f, 0.4f, 1.0f };
-
-		while (true)
+		while (m_Running)
 		{
+			Time::_Tick();
 			m_Window->OnUpdate();
 
-			Renderer::BeginFrame(camera, transform);
-			Renderer::DrawQuad({ 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f, 1.0f });
-			Renderer::EndFrame();
+			for (Layer* layer : m_LayerStack)
+			{
+				layer->OnUpdate();
+			}
+
+			if (Time::GetFixedDeltaTime() > 0.0f)
+			{
+				for (Layer* layer : m_LayerStack)
+				{
+					layer->OnFixedUpdate();
+				}
+			}
+
+			m_LayerStack.Flush();
 		}
+	}
+
+	bool Application::_OnWindowClose()
+	{
+		m_Running = false;
+		return false;
 	}
 }
