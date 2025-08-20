@@ -7,3 +7,9 @@
 [submodule "Vendor/Modules/stb"]
 	path = Vendor/Modules/stb
 	url = https://github.com/nothings/stb.git
+[submodule "Vendor/Modules/imgui"]
+	path = Vendor/Modules/imgui
+	url = git@github.com:Mythidas/imgui.git
+[submodule "Vendor/Modules/imguizmo"]
+	path = Vendor/Modules/imguizmo
+	url = https://github.com/CedricGuillemet/ImGuizmo.git

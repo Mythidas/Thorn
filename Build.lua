@@ -1,5 +1,5 @@
 -- premake5.lua
-workspace "Thorn"
+workspace "ThornEngine"
    architecture "x64"
    configurations { "Debug", "Release", "Dist" }
    startproject "App"
@@ -10,10 +10,11 @@ workspace "Thorn"
 
 OutputDir = "%{cfg.system}-%{cfg.architecture}/%{cfg.buildcfg}"
 
-include "Engine/Build-Engine.lua"
+include "Thorn/Build-Thorn.lua"
 
 group "Vendor"
 	include "Vendor/Modules/glfw/Build.lua"
+	include "Vendor/Modules/imgui/Build.lua"
 group ""
 
-include "Editor/Build-Editor.lua"
+include "Rose/Build-Rose.lua"

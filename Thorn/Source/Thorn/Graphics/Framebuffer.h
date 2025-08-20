@@ -20,7 +20,7 @@ namespace Thorn
 		void Unbind() const;
 		void Resize(const UVector2& size);
 
-		inline void* GetRenderID() const { return reinterpret_cast<void*>((uint32_t)m_Texture); }
+		inline void* GetRenderID() const { return reinterpret_cast<void*>((uintptr_t)m_Texture); }
 		inline const FramebufferSpecs& GetSpecs() const { return m_Specs; }
 
 	private:

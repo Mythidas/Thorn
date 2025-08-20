@@ -12,6 +12,7 @@ namespace Thorn
 	{
 		WindowSpecs windowSpecs{};
 		m_Window = Window::Create(windowSpecs);
+		m_ImGUI = ImGUI::Create(m_Window->GetNativeWindow());
 		
 		Renderer::_Init();
 		Renderer::Resize({ windowSpecs.Width, windowSpecs.Height });
@@ -52,6 +53,15 @@ namespace Thorn
 					layer->OnFixedUpdate();
 				}
 			}
+
+#ifdef THORN_DEBUG
+			m_ImGUILayer->BeginUI();
+			for (Layer* layer : m_LayerStack)
+			{
+				layer->OnRenderUI();
+			}
+			m_ImGUILayer->EndUI();
+#endif
 
 			m_LayerStack.Flush();
 		}

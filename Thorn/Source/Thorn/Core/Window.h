@@ -32,6 +32,7 @@ namespace Thorn {
 
 		uint32_t GetWidth() const { return m_Specs.Width; }
 		uint32_t GetHeight() const { return m_Specs.Height; }
+		void* GetNativeWindow() const { return m_NativeWindow; }
 	private:
 		Window(const WindowSpecs& specs);
 

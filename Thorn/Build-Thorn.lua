@@ -1,4 +1,4 @@
-project "Engine"
+project "Thorn"
    kind "StaticLib"
    language "C++"
    cppdialect "C++latest"
@@ -17,12 +17,15 @@ project "Engine"
       "../Vendor/Modules/glfw/include",
       "../Vendor/Modules/glad/include",
       "../Vendor/Modules/glm",
-      "../Vendor/Modules/stb"
+      "../Vendor/Modules/stb",
+      "../Vendor/Modules/imgui",
+      "../Vendor/Modules/imguizmo"
    }
 
    links
    {
-       "GLFW"
+       "GLFW",
+       "ImGui"
    }
 
    targetdir ("../Binaries/" .. OutputDir .. "/%{prj.name}")

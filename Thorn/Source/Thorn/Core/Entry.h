@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef ENGINE_ENTRY_POINT
+#ifdef THORN_ENTRY_POINT
 extern Thorn::Application* Thorn::CreateApplication();
 
 int main(int argc, char** argv)

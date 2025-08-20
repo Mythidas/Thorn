@@ -27,6 +27,7 @@ namespace Thorn
 			case ImageWrap::Repeat: return GL_REPEAT;
 			case ImageWrap::ClampToEdge: return GL_CLAMP_TO_EDGE;
 			case ImageWrap::MirroredRepeat: return GL_MIRRORED_REPEAT;
+			default: return GL_CLAMP_TO_EDGE;
 			}
 		}
 
@@ -36,6 +37,7 @@ namespace Thorn
 			{
 			case ImageTiling::Linear: return GL_LINEAR;
 			case ImageTiling::Nearest: return GL_NEAREST;
+			default: return GL_NEAREST;
 			}
 		}
 
@@ -46,6 +48,7 @@ namespace Thorn
 			case ImageFormat::R8: return GL_RED;
 			case ImageFormat::RGBA8: return GL_RGBA;
 			case ImageFormat::RGBA32F: return GL_RGBA;
+			default: return GL_RGBA;
 			}
 		}
 
@@ -56,6 +59,7 @@ namespace Thorn
 			case ImageFormat::R8: return GL_R8;
 			case ImageFormat::RGBA8: return GL_RGBA8;
 			case ImageFormat::RGBA32F: return GL_RGBA32F;
+			default: return GL_RGBA8;
 			}
 		}
 
@@ -66,9 +70,8 @@ namespace Thorn
 			case ImageFormat::R8: return 1;
 			case ImageFormat::RGBA8: return 4;
 			case ImageFormat::RGBA32F: return 4 * 4;
+			default: return 0;
 			}
-
-			return 0;
 		}
 
 		static void SetGLImage(const ImageSpecs& specs)

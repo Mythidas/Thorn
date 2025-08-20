@@ -1,4 +1,4 @@
-project "Editor"
+project "Rose"
    kind "ConsoleApp"
    language "C++"
    cppdialect "C++latest"
@@ -12,20 +12,20 @@ project "Editor"
    {
       "Source",
 
-	  -- Include Core
-	  "../Engine/Source",
+      -- Include Core
+      "../Thorn/Source",
       "../Vendor/Modules/glm"
    }
 
    links
    {
-      "Engine"
+      "Thorn"
    }
 
    targetdir ("../Binaries/" .. OutputDir .. "/%{prj.name}")
    objdir ("../Binaries/Intermediates/" .. OutputDir .. "/%{prj.name}")
 
-   defines { "ENGINE_ENTRY_POINT" }
+   defines { "THORN_ENTRY_POINT","THORN_DEBUG" }
 
    filter "system:windows"
        systemversion "latest"

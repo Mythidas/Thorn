@@ -2,6 +2,7 @@
 
 #include "Thorn/Lib/Singleton.h"
 #include "Thorn/Lib/Pointers.h"
+#include "Thorn/Graphics/ImGUI.h"
 #include "Window.h"
 #include "LayerStack.h"
 
@@ -21,7 +22,9 @@ namespace Thorn {
 
 	private:
 		Scope<Window> m_Window;
+		Ref<ImGUI> m_ImGUI;
 		LayerStack m_LayerStack;
+
 
 		bool m_Running = false;
 
