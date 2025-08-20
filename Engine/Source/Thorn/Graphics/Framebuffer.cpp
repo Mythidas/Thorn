@@ -30,6 +30,8 @@ namespace Thorn
 
 	void Framebuffer::Resize(const UVector2& size)
 	{
+		m_Specs.Size = size;
+
 		glDeleteFramebuffers(1, &m_RenderID);
 		glDeleteTextures(1, &m_Texture);
 		glDeleteRenderbuffers(1, &m_RenderObject);

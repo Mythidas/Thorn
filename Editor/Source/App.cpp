@@ -9,6 +9,7 @@ public:
 	void OnAttach()
 	{
 		camera.ClearColor = { 1.0f, 0.7f, 0.4f, 1.0f };
+		transform.Position.z = 3.0f;
 	}
 
 	void OnUpdate()

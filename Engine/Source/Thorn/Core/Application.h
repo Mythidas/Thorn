@@ -26,7 +26,10 @@ namespace Thorn {
 		bool m_Running = false;
 
 		EventListener<> m_WindowCloseListener;
+		EventListener<int, int> m_WindowResizeListener;
+
 		bool _OnWindowClose();
+		bool _OnWindowResize(int width, int height);
 	};
 
 	static Application* CreateApplication();

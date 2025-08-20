@@ -14,9 +14,13 @@ namespace Thorn
 		m_Window = Window::Create(windowSpecs);
 		
 		Renderer::_Init();
+		Renderer::Resize({ windowSpecs.Width, windowSpecs.Height });
 
 		m_WindowCloseListener = EventListener<>(THORN_BIND_FNC(_OnWindowClose));
+		m_WindowResizeListener = EventListener<int, int>(THORN_BIND_FNC(_OnWindowResize));
+
 		Window::OnWindowClose += m_WindowCloseListener;
+		Window::OnWindowResize += m_WindowResizeListener;
 	}
 
 	Application::~Application()
@@ -56,6 +60,12 @@ namespace Thorn
 	bool Application::_OnWindowClose()
 	{
 		m_Running = false;
+		return false;
+	}
+
+	bool Application::_OnWindowResize(int width, int height)
+	{
+		Renderer::Resize({ width, height });
 		return false;
 	}
 }

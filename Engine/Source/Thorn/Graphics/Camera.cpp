@@ -5,12 +5,13 @@
 
 namespace Thorn
 {
-	void Camera::CalculateProjection(uint32_t width, uint32_t height)
+	Matrix4 Camera::GetProjection(const UVector2& size) const
 	{
-		float aspect = (float)width / (float)height;
+		float aspectRatio = (float)size.x / (float)size.y;
+
 		if (Mode == CameraMode::Perspective)
-			Projection = glm::perspective(glm::radians(FieldOfView), aspect, NearClip, FarClip);
+			return glm::perspective(glm::radians(FieldOfView), aspectRatio, NearClip, FarClip);
 		else
-			Projection = glm::ortho(-OrthoSize * aspect, OrthoSize * aspect, -OrthoSize, OrthoSize, NearClip, FarClip);
+			return glm::ortho(-OrthoSize * aspectRatio, OrthoSize * aspectRatio, -OrthoSize, OrthoSize, NearClip, FarClip);
 	}
 }

@@ -140,8 +140,10 @@ namespace Thorn
 		transformCopy.Position.y *= -1;
 		transformCopy.Position.z *= -1;
 
+		
+
 		s_QuadData.Camera.View = transformCopy.GetInverseMatrix();
-		s_QuadData.Camera.Projection = camera.Projection;
+		s_QuadData.Camera.Projection = camera.GetProjection(s_QuadData.SwapBuffer->GetSpecs().Size);
 		s_QuadData.CameraUniform->SetData(&s_QuadData.Camera, sizeof(Render::Data::CameraBuffer), 0);
 
 		if (swapBuffer)

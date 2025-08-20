@@ -41,8 +41,7 @@ namespace Thorn
 	}
 	Matrix4 Transform::GetMatrix() const
 	{
-		return glm::translate(glm::mat4(1.0f), Position)
-			* glm::scale(glm::mat4(1.0f), Scale);
+		return glm::lookAt(Position, Position + Forward(), Up());
 	}
 	Matrix4 Transform::GetInverseMatrix() const
 	{
